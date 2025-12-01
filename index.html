@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog Cá Nhân - Mã Ngọc Anh Khoa</title>
+    <!-- Tải Tailwind CSS cho styling hiện đại và responsive -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Đổi font chữ sang Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* Thiết lập font Poppins mặc định */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #ffffff; /* Màu nền trắng */
+            color: #212529;
+            transition: background-color 0.3s ease;
+        }
+
+        /* --- Custom Animations (Keyframes) --- */
+
+        /* Animation cho Avatar (Đổ bóng màu cam) */
+        @keyframes pulse-shadow {
+            0% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.4); } /* Màu cam 500 */
+            70% { box-shadow: 0 0 0 10px rgba(249, 115, 22, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0); }
+        }
+
+        .avatar-shadow {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            animation: pulse-shadow 2s infinite cubic-bezier(0.66, 0, 0, 1);
+        }
+
+        /* Hiệu ứng chung: Fade In và Slide Up */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fadeInUp {
+            animation: fadeInUp 0.7s ease-out forwards;
+            opacity: 0; /* Bắt đầu ẩn */
+        }
+
+        /* Thiết lập độ trễ cho các animation xếp tầng */
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+        .delay-4 { animation-delay: 0.4s; }
+        .delay-5 { animation-delay: 0.5s; }
+        .delay-6 { animation-delay: 0.6s; }
+        .delay-7 { animation-delay: 0.7s; }
+
+        /* --- Styling cho Menu và Sections --- */
+        .nav-link {
+            position: relative;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            transition: color 0.3s ease, transform 0.2s ease;
+            font-weight: 500;
+        }
+
+        .nav-link:hover {
+            color: #f97316;
+            transform: translateY(-2px);
+        }
+
+        .nav-link.active {
+            color: #ea580c;
+            font-weight: 700;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 3px;
+            background-color: #f97316;
+            transition: width 0.3s ease;
+            border-radius: 9999px;
+        }
+
+        .nav-link.active::after,
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        /* Container cho nội dung chính (transition cho việc chuyển section) */
+        .content-section {
+            display: none;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+            min-height: calc(100vh - 12rem);
+        }
+
+        .content-section.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Hiệu ứng hover cho nút và card */
+        .hover-lift:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .hover-grow {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col bg-gray-50">
+
+    <!-- Header -->
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+            <a href="#" class="text-2xl font-bold text-gray-800 hover:text-orange-600 transition duration-300">
+                Mã Ngọc Anh Khoa
+            </a>
+            
+            <!-- Menu điều hướng -->
+            <nav class="hidden md:flex space-x-4">
+                <div class="nav-link active" data-target="gioi-thieu">Giới Thiệu</div>
+                <div class="nav-link" data-target="ky-nang">Kỹ Năng</div>
+                <div class="nav-link" data-target="du-an">Dự Án</div>
+                <div class="nav-link" data-target="lien-he">Liên Hệ</div>
+            </nav>
+            
+            <!-- Nút menu cho mobile -->
+            <button id="mobile-menu-button" class="md:hidden p-2 rounded-md text-gray-700 hover:bg-gray-100 transition duration-300">
+                <!-- Icon menu (Hamburger) -->
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
+        </div>
+
+        <!-- Menu mobile ẩn -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white shadow-lg border-t border-gray-100">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <div class="nav-link block px-3 py-2 text-base font-medium active" data-target="gioi-thieu">Giới Thiệu</div>
+                <div class="nav-link block px-3 py-2 text-base font-medium" data-target="ky-nang">Kỹ Năng</div>
+                <div class="nav-link block px-3 py-2 text-base font-medium" data-target="du-an">Dự Án</div>
+                <div class="nav-link block px-3 py-2 text-base font-medium" data-target="lien-he">Liên Hệ</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Body - Nội dung chính -->
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+
+        <!-- 1. Giới Thiệu (Trang Chủ) -->
+        <section id="gioi-thieu" class="content-section active">
+            <div class="flex flex-col md:flex-row items-center md:space-x-12 py-10">
+                <!-- Phần hình ảnh và thông tin cơ bản -->
+                <div class="w-full md:w-1/3 flex justify-center mb-8 md:mb-0 animate-fadeInUp delay-1">
+                    <div class="relative">
+                        <!-- Hình ảnh cá nhân (Avatar) -->
+                        <img src="https://lh3.googleusercontent.com/a/ACg8ocIAhDUl5hazDEPAo4LInbrnhTuOqbFt9C5iutuYoDZfqXB6JDrpXaVYHrXVMqOLUeMwvthOgZ4VPGJWJxOP1RRtKuiNJg=s360-c-no" 
+                             alt="Hình ảnh của Mã Ngọc Anh Khoa" 
+                             class="w-64 h-64 object-cover rounded-full border-4 border-orange-500 avatar-shadow transition duration-500 ease-in-out hover:scale-105"
+                             onerror="this.onerror=null; this.src='https://placehold.co/300x300/f97316/ffffff?text=AVATAR';"
+                        >
+                    </div>
+                </div>
+                
+                <!-- Phần giới thiệu chi tiết -->
+                <div class="w-full md:w-2/3">
+                    <p class="text-xl text-orange-600 font-semibold mb-2 animate-fadeInUp delay-2">
+                        <span class="inline-block text-3xl mr-2">👋</span> Xin chào, tôi là
+                    </p>
+                    
+                    <!-- Tiêu đề chính -->
+                    <h1 class="text-5xl sm:text-6xl font-extrabold text-gray-900 leading-tight mb-4 animate-fadeInUp delay-3">
+                        Mã Ngọc Anh Khoa
+                    </h1>
+                    
+                    <!-- Vai trò chính (Đã cập nhật Tây Nguyên và màu chữ cam) -->
+                    <h2 class="text-3xl font-light text-orange-600 mb-2 border-l-4 border-orange-500 pl-4 animate-fadeInUp delay-4">
+                        Sinh Viên Cao Đẳng FPT POLYTECHNIC Tây Nguyên
+                    </h2>
+                    
+                    <!-- THÔNG TIN MSSV VÀ CHUYÊN NGÀNH -->
+                    <p class="text-xl font-medium text-orange-600 mb-2 border-l-4 border-orange-500 pl-4 animate-fadeInUp delay-5">
+                        Mã số sinh viên: PK04460
+                    </p>
+                    <p class="text-xl font-medium text-orange-600 mb-6 border-l-4 border-orange-500 pl-4 animate-fadeInUp delay-6">
+                        Chuyên ngành: Lập trình Ứng dụng AI
+                    </p>
+                    
+                    <!-- Mô tả đã rút gọn và chuẩn xác -->
+                    <p class="text-lg text-gray-600 mb-6 leading-relaxed animate-fadeInUp delay-7">
+                        Chào mừng bạn! Tôi là sinh viên Lập trình Ứng dụng Trí tuệ Nhân tạo (AI) tại Cao đẳng FPT Polytechnic. Với niềm đam mê tạo ra các giải pháp thông minh, tôi tập trung phát triển công nghệ mới để mang lại trải nghiệm tối ưu và góp phần vào sự phát triển của đất nước.
+                    </p>
+                    
+                    <!-- Nút (Màu cam) -->
+                    <div class="animate-fadeInUp delay-7">
+                        <div class="inline-block bg-orange-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-orange-700 transition duration-300 ease-in-out transform hover-lift shadow-lg cursor-pointer" data-target-jump="lien-he">
+                            <span class="mr-2">📝</span> Bắt đầu trò chuyện
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. Kỹ Năng -->
+        <section id="ky-nang" class="content-section">
+            <h2 class="text-4xl font-bold text-gray-800 mb-8 text-center animate-fadeInUp delay-1">Kỹ Năng Chuyên Môn</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Card 1: Lập trình AI/Machine Learning -->
+                <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-orange-500 hover-grow animate-fadeInUp delay-2">
+                    <h3 class="text-2xl font-semibold text-gray-800 mb-3 flex items-center">
+                        <span class="mr-3 text-orange-500 text-3xl">🧠</span> Lập trình AI/ML
+                    </h3>
+                    <ul class="space-y-2 text-gray-600 list-none">
+                        <li>Ngôn ngữ: Python (Nền tảng chính cho AI)</li>
+                        <li>Thư viện: NumPy, Pandas, Scikit-learn, TensorFlow/PyTorch</li>
+                        <li>Mô hình: Classification, Regression, Clustering</li>
+                        <li>Cơ sở: Thuật toán Machine Learning cơ bản</li>
+                    </ul>
+                </div>
+
+                <!-- Card 2: Phát Triển Web & Backend -->
+                <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-green-500 hover-grow animate-fadeInUp delay-3">
+                    <h3 class="text-2xl font-semibold text-gray-800 mb-3 flex items-center">
+                        <span class="mr-3 text-green-500 text-3xl">⚙️</span> Lập trình Ứng dụng
+                    </h3>
+                    <ul class="space-y-2 text-gray-600 list-none">
+                        <li>Backend: FastAPI/Flask (Phục vụ mô hình AI)</li>
+                        <li>Frontend: HTML, CSS, JavaScript (Giao diện người dùng)</li>
+                        <li>Cơ sở dữ liệu: SQL, NoSQL</li>
+                        <li>Phát triển ứng dụng Web/API tích hợp AI</li>
+                    </ul>
+                </div>
+
+                <!-- Card 3: Phân tích Dữ liệu & Công cụ -->
+                <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-yellow-500 hover-grow animate-fadeInUp delay-4">
+                    <h3 class="text-2xl font-semibold text-gray-800 mb-3 flex items-center">
+                        <span class="mr-3 text-yellow-500 text-3xl">📊</span> Data & Công Cụ
+                    </h3>
+                    <ul class="space-y-2 text-gray-600 list-none">
+                        <li>Phân tích dữ liệu và tiền xử lý</li>
+                        <li>Trực quan hóa dữ liệu (Matplotlib, Seaborn)</li>
+                        <li>Công cụ: Jupyter Notebook, Git/GitHub</li>
+                        <li>Kỹ năng: Tư duy logic và giải quyết vấn đề</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. Dự Án (Đã thêm iFrame) -->
+        <section id="du-an" class="content-section">
+            <h2 class="text-4xl font-bold text-gray-800 mb-8 text-center animate-fadeInUp delay-1">Các Dự Án Tiêu Biểu</h2>
+            <div class="space-y-12">
+                <!-- Project 1: Hệ thống Dự đoán Giá (ML) -->
+                <div class="bg-white p-6 rounded-xl shadow-lg border-l-8 border-orange-500 hover-lift flex flex-col transition duration-300 animate-fadeInUp delay-2">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+                        <!-- Cột 1: Video Player (iFrame) -->
+                        <div class="w-full">
+                            <h3 class="text-2xl font-bold text-orange-600 mb-2 md:hidden">Hệ thống Dự đoán Giá (ML)</h3>
+                            <!-- Responsive Iframe Container (16:9 Aspect Ratio) -->
+                            <div class="relative pt-[56.25%] overflow-hidden rounded-lg shadow-xl">
+                                <iframe 
+                                    class="absolute top-0 left-0 w-full h-full" 
+                                    src="https://drive.google.com/file/d/1E8e306meC3OKF2JQAvcRF-tkCQXZkPa1/preview" 
+                                    frameborder="0" 
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                    allowfullscreen>
+                                </iframe>
+                            </div>
+                            <p class="text-sm text-gray-500 mt-2 text-center">Video demo dự án đã được nhúng từ Google Drive.</p>
+                        </div>
+                        
+                        <!-- Cột 2: Description -->
+                        <div class="w-full">
+                            <h3 class="text-2xl font-bold text-orange-600 mb-2 hidden md:block">Hệ thống Dự đoán Giá (ML)</h3>
+                            <p class="text-gray-700 mb-4">
+                                Xây dựng mô hình Machine Learning để dự đoán giá nhà/đất dựa trên các yếu tố đầu vào (vị trí, diện tích, tiện ích). Mục tiêu ứng dụng trong thị trường bất động sản Việt Nam.
+                            </p>
+                            <span class="inline-block bg-orange-100 text-orange-800 text-xs font-semibold px-3 py-1 rounded-full mr-2">Python</span>
+                            <span class="inline-block bg-orange-100 text-orange-800 text-xs font-semibold px-3 py-1 rounded-full mr-2">Scikit-learn</span>
+                            <span class="inline-block bg-orange-100 text-orange-800 text-xs font-semibold px-3 py-1 rounded-full">Web App Interface</span>
+                            <a href="#" class="inline-block mt-4 text-orange-500 hover:text-orange-700 font-medium transition duration-300">Xem Tài Liệu &rarr;</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project 2: Hệ thống Phân loại Ảnh (Computer Vision) -->
+                <div class="bg-white p-6 rounded-xl shadow-lg border-l-8 border-orange-500 hover-lift flex flex-col transition duration-300 animate-fadeInUp delay-3">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+                        <!-- Cột 1: Video Player (iFrame) -->
+                        <div class="w-full">
+                            <h3 class="text-2xl font-bold text-orange-600 mb-2 md:hidden">Hệ thống Phân loại Ảnh (Computer Vision)</h3>
+                            <!-- Responsive Iframe Container (16:9 Aspect Ratio) -->
+                            <div class="relative pt-[56.25%] overflow-hidden rounded-lg shadow-xl">
+                                <iframe 
+                                    class="absolute top-0 left-0 w-full h-full" 
+                                    src="https://www.youtube.com/embed/fS9r5i7Xo3U" 
+                                    frameborder="0" 
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                    allowfullscreen>
+                                </iframe>
+                            </div>
+                            <p class="text-sm text-gray-500 mt-2 text-center">**Thay thế URL này bằng video demo của bạn**</p>
+                        </div>
+
+                        <!-- Cột 2: Description -->
+                        <div class="w-full">
+                            <h3 class="text-2xl font-bold text-orange-600 mb-2 hidden md:block">Hệ thống Phân loại Ảnh (Computer Vision)</h3>
+                            <p class="text-gray-700 mb-4">
+                                Phát triển mô hình Deep Learning (CNN) để phân loại các đối tượng trong ảnh. Ứng dụng tiềm năng trong nông nghiệp thông minh hoặc giám sát đô thị.
+                            </p>
+                            <span class="inline-block bg-orange-100 text-orange-800 text-xs font-semibold px-3 py-1 rounded-full mr-2">TensorFlow</span>
+                            <span class="inline-block bg-orange-100 text-orange-800 text-xs font-semibold px-3 py-1 rounded-full mr-2">Python</span>
+                            <span class="inline-block bg-orange-100 text-orange-800 text-xs font-semibold px-3 py-1 rounded-full">Computer Vision</span>
+                            <a href="#" class="inline-block mt-4 text-orange-500 hover:text-orange-700 font-medium transition duration-300">Xem Tài Liệu &rarr;</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. Liên Hệ -->
+        <section id="lien-he" class="content-section">
+            <div class="bg-white p-8 rounded-xl shadow-2xl max-w-lg mx-auto animate-fadeInUp delay-1">
+                <h2 class="text-4xl font-bold text-gray-800 mb-6 text-center">Liên Hệ Với Tôi</h2>
+                <p class="text-center text-lg text-gray-600 mb-8">
+                    Tôi luôn sẵn lòng đón nhận các cơ hội hợp tác hoặc thảo luận về công nghệ, đặc biệt là các dự án AI hướng đến cộng đồng!
+                </p>
+                
+                <form id="contact-form" class="space-y-4">
+                    <!-- Form fields -->
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-gray-700">Tên của bạn</label>
+                        <input type="text" id="name" name="name" required 
+                               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 transition duration-300">
+                    </div>
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                        <input type="email" id="email" name="email" required 
+                               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 transition duration-300">
+                    </div>
+                    <div>
+                        <label for="message" class="block text-sm font-medium text-gray-700">Nội dung</label>
+                        <textarea id="message" name="message" rows="4" required 
+                                  class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 transition duration-300"></textarea>
+                    </div>
+                    <button type="submit" 
+                            class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-lg font-medium text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition duration-300 transform hover-lift">
+                        Gửi Tin Nhắn
+                    </button>
+                </form>
+
+                <!-- Message Box -->
+                <div id="status-message" class="mt-4 p-3 bg-orange-100 text-orange-800 rounded-md text-center hidden transition duration-500"></div>
+
+                <div class="mt-8 text-center space-y-2">
+                    <p class="text-gray-700">Hoặc kết nối qua:</p>
+                    <p class="text-lg font-medium text-orange-600">Email: <a href="mailto:mangocanhkhoa1199@gmail.com" class="hover:underline">mangocanhkhoa1199@gmail.com</a></p>
+                    <p class="text-lg font-medium text-orange-600">Điện thoại: 0948750003</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white mt-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 text-center">
+            <p>&copy; 2025 Blog Cá Nhân Của Mã Ngọc Anh Khoa. All rights reserved.</p>
+            <p class="text-sm text-gray-400 mt-1">Thiết kế và phát triển với HTML, Tailwind CSS & JavaScript.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const contentSections = document.querySelectorAll('.content-section');
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const contactForm = document.getElementById('contact-form');
+            const statusMessage = document.getElementById('status-message');
+            const chatButton = document.querySelector('[data-target-jump="lien-he"]');
+
+            // Hàm hiển thị nội dung section
+            function showSection(targetId) {
+                // Xóa active khỏi tất cả sections và links
+                contentSections.forEach(section => {
+                    section.classList.remove('active');
+                });
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                });
+
+                // Thêm active cho section mục tiêu
+                const targetSection = document.getElementById(targetId);
+                if (targetSection) {
+                    // Kích hoạt class 'active' sau một khoảng delay nhỏ để đảm bảo transition được áp dụng
+                    setTimeout(() => {
+                        targetSection.classList.add('active');
+                    }, 50); 
+                }
+
+                // Thêm active cho links mục tiêu
+                document.querySelectorAll(`[data-target="${targetId}"]`).forEach(link => {
+                    link.classList.add('active');
+                });
+                
+                // Đóng menu mobile sau khi chọn
+                if (!mobileMenu.classList.contains('hidden')) {
+                    mobileMenu.classList.add('hidden');
+                }
+            }
+
+            // Xử lý sự kiện click trên menu
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    const targetId = e.target.getAttribute('data-target');
+                    if (targetId) {
+                        showSection(targetId);
+                    }
+                });
+            });
+
+            // Xử lý nút "Bắt đầu trò chuyện"
+            if (chatButton) {
+                chatButton.addEventListener('click', () => {
+                    showSection('lien-he');
+                });
+            }
+
+            // Xử lý sự kiện click nút menu mobile
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            // Xử lý form liên hệ
+            contactForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                // Hiển thị thông báo thành công (thay thế alert)
+                statusMessage.textContent = 'Cảm ơn bạn! Tin nhắn của bạn đã được gửi thành công.';
+                statusMessage.classList.remove('hidden', 'bg-red-100', 'text-red-800');
+                statusMessage.classList.add('bg-green-100', 'text-green-800'); 
+                
+                // Reset form
+                contactForm.reset();
+
+                // Ẩn thông báo sau 5 giây
+                setTimeout(() => {
+                    statusMessage.classList.add('hidden');
+                }, 5000);
+            });
+            
+            // Khởi tạo trang chủ (đảm bảo phần giới thiệu hiển thị lần đầu)
+            showSection('gioi-thieu');
+        });
+    </script>
+</body>
+</html>
